@@ -40,6 +40,13 @@ jobs:
       - name: Install deps
         run: pnpm install
 
+      - name: Lint format
+        run: pnpm run lint:format
+      - name: Lint fix
+        run: pnpm run lint:fix
+      - name: Lint css
+        run: pnpm run lint:css
+
   build:
     runs-on: ${{ matrix.os }}
     strategy:
