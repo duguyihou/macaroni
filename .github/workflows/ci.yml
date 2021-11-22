@@ -10,7 +10,44 @@ on:
   workflow_dispatch:
 
 jobs:
-  pnpm:
+  commitlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - uses: wagoid/commitlint-github-action@v4
+
+  lint:
+    runs-on: ubuntu-latest
+    name: "Lint: node-14, ubuntu-latest"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 6.17.0
+
+      - name: Set node version to 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: 14
+          cache: "pnpm"
+
+      - name: Install deps
+        run: pnpm install
+
+      - name: Lint format
+        run: pnpm run lint:format
+      - name: Lint fix
+        run: pnpm run lint:fix
+      - name: Lint css
+        run: pnpm run lint:css
+
+  build:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
@@ -26,7 +63,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v2.0.1
         with:
-          version: 6
+          version: 6.17.0
 
       - name: Set node version to ${{ matrix.node_version }}
         uses: actions/setup-node@v2
@@ -36,23 +73,3 @@ jobs:
 
       - name: Install deps
         run: pnpm install
-
-  commitlint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v4
-
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: amondnet/vercel-action@v20
-        with:
-          vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
-          # github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
-          vercel-args: "--prod" #Optional
-          vercel-org-id: ${{ secrets.ORG_ID}} #Required
-          vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
