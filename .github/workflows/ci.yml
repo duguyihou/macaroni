@@ -1,5 +1,7 @@
 name: ci
-on: [pull_request]
+on:
+  - push
+  - pull_request
 
 jobs:
   commitlint:
@@ -7,7 +9,18 @@ jobs:
     steps:
       - name: Setup PNPM
         uses: pnpm/action-setup@v2.0.1
-      - uses: actions/checkout@v2
+        with:
+          version: 6
+      - name: lint commit messages
+        uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - uses: wagoid/commitlint-github-action@v4
+        uses: wagoid/commitlint-github-action@v4
+      - name: deploy
+        uses: amondnet/vercel-action@v20
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
+          # github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
+          vercel-args: "--prod" #Optional
+          vercel-org-id: ${{ secrets.ORG_ID}} #Required
+          vercel-project-id: ${{ secrets.PROJECT_ID}} #Required
