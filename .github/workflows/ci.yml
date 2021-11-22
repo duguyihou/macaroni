@@ -1,7 +1,12 @@
 name: ci
 on:
-  - push
-  - pull_request
+  push:
+    branches:
+      - main
+      - release/*
+  pull_request:
+    branches:
+      - master
 
 jobs:
   commitlint:
